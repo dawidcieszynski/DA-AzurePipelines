@@ -41,4 +41,13 @@ steps:
       command: publish
       publishWebProjects: false
       projects: src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj
-      arguments: '--configuration Release'
+      arguments: '--configuration Release -o $(Build.ArtifactStagingDirectory)/backend'
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)/backend'
+      artifact: 'backend'
+      publishLocation: 'pipeline'
+
+
+
