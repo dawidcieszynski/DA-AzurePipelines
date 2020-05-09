@@ -17,14 +17,14 @@ pool:
 
 steps:
   - task: Npm@1
+    displayName: 'npm install'
     inputs:
-      displayName: 'npm install'
       command: 'install'
       workingDir: 'src/frontend'
 
   - task: Npm@1
+    displayName: 'npm run build'
     inputs:
-      displayName: 'npm run build'
       command: 'custom'
       workingDir: 'src/frontend'
       customCommand: 'run build -- --prod'
