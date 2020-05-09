@@ -6,21 +6,48 @@
 trigger:
   branches:
     include:
-     - master
+      - master
   paths:
     include:
-     - src/frontend/*
+      - src/frontend/*
+      - azure-pipelines-frontend.yml
 
 pool:
   vmImage: 'windows-latest'
 
-- task: Npm@1
-  inputs:
-    command: 'install'
-    workingDir: 'src/frontend'
+steps:
+  - task: Npm@1
+    inputs:
+      displayName: 'npm install'
+      command: 'install'
+      workingDir: 'src/frontend'
 
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    workingDir: 'src/frontend'
-    customCommand: 'run build -- --prod'
+  - task: Npm@1
+    inputs:
+      displayName: 'npm run build'
+      command: 'custom'
+      workingDir: 'src/frontend'
+      customCommand: 'run build -- --prod'
+
+  - task: Npm@1
+    displayName: 'npm test-ci'
+    inputs:
+      command: custom
+      workingDir: 'src/frontend'
+      verbose: false
+      customCommand: 'run test-ci'
+    continueOnError: true
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/TESTS-*.xml'
+    inputs:
+      testResultsFiles: '**/TESTS-*.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)/src/frontend/junit'
+      failTaskOnFailedTests: true
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage from src/frontend/coverage/ToDoListApp/cobertura-coverage.xml'
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: 'src/frontend/coverage/ToDoListApp/cobertura-coverage.xml'
+      failIfCoverageEmpty: true

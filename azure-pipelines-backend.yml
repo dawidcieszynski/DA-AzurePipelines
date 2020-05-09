@@ -1,0 +1,44 @@
+# Node.js with Angular
+# Build a Node.js project that uses Angular.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - src/backend/*
+      - azure-pipelines-backend.yml
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: restore
+      projects: src/backend/ToDoList.sln
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build'
+    inputs:
+      projects: src/backend/ToDoList.sln
+      arguments: '--configuration Release'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet test'
+    inputs:
+      command: test
+      projects: '**/*.UnitTests.csproj'
+      arguments: '--configuration Release --collect "Code coverage"'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet publish'
+    inputs:
+      command: publish
+      publishWebProjects: false
+      projects: src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj
+      arguments: '--configuration Release'
