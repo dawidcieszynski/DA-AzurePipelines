@@ -44,10 +44,12 @@ steps:
       arguments: '--configuration Release -o $(Build.ArtifactStagingDirectory)/backend'
 
   - task: CmdLine@2
+    displayName: 'dotnet tool install --global dotnet-ef'
     inputs:
       script: 'dotnet tool install --global dotnet-ef'
 
   - task: CmdLine@2
+    displayName: 'dotnet ef migrations script'
     inputs:
       script: 'dotnet ef migrations script -i -o %BUILD_ARTIFACTSTAGINGDIRECTORY%\migrate\scripts.sql --project src/backend/ToDoList.EntityFramework/ToDoList.EntityFramework.csproj --startup-project src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj'
   
