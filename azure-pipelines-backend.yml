@@ -43,13 +43,10 @@ steps:
       projects: src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj
       arguments: '--configuration Release -o $(Build.ArtifactStagingDirectory)/backend'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet ef migrations script'
+  - task: CmdLine@2
     inputs:
-      command: 'custom'
-      custom: 'ef'
-      arguments: 'migrations script -i -o $(Build.ArtifactStagingDirectory)\migrate\scripts.sql --proejct src/backend/ToDoList.EntityFramework/ToDoList.EntityFramework.csproj --startup-project src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj'
-
+      script: 'dotnet ef migrations script -i -o %BUILD_ARTIFACTSTAGINGDIRECTORY%\migrate\scripts.sql --proejct src/backend/ToDoList.EntityFramework/ToDoList.EntityFramework.csproj --startup-project src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj'
+  
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(Build.ArtifactStagingDirectory)/backend'
