@@ -49,7 +49,7 @@ steps:
 
   - task: CmdLine@2
     inputs:
-      script: 'dotnet ef migrations script -i -o %BUILD_ARTIFACTSTAGINGDIRECTORY%\migrate\scripts.sql --proejct src/backend/ToDoList.EntityFramework/ToDoList.EntityFramework.csproj --startup-project src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj'
+      script: 'dotnet ef migrations script -i -o %BUILD_ARTIFACTSTAGINGDIRECTORY%\migrate\scripts.sql --project src/backend/ToDoList.EntityFramework/ToDoList.EntityFramework.csproj --startup-project src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj'
   
   - task: PublishPipelineArtifact@1
     inputs:
