@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ToDoItem } from './to-do-list-view/to-do-item.model';
-import { environment } from 'src/environments/environment';
 import { ToDoItemsDataSourceService } from './to-do-items-data-source.service';
 import { HttpClient } from '@angular/common/http';
-import { take } from 'rxjs/operators';
+import { EnvConfigService } from '../env-config.service';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -12,30 +12,31 @@ import { take } from 'rxjs/operators';
 export class ToDoItemsDataSourceRealService implements ToDoItemsDataSourceService {
   private items: BehaviorSubject<ToDoItem[]> = new BehaviorSubject<ToDoItem[]>([]);
   private url: string;
-  constructor(private httpClient: HttpClient) {
-    this.url = environment.apiUrl;
+  constructor(private httpClient: HttpClient, private envConfigService: EnvConfigService) {
+
   }
 
   public getToDoItems$(): Observable<ToDoItem[]> {
-    var getUrl = this.url + "/api/listitems";
-    this.httpClient.get(getUrl).subscribe((x: ToDoItem[]) => {
-      this.items.next(x);
-    });
+    this.envConfigService.getApiUrl$()
+      .pipe(switchMap(x => this.httpClient.get(x + "/api/listitems")))
+      .subscribe((x: ToDoItem[]) => {
+        this.items.next(x);
+      });
     return this.items.asObservable();
   }
 
   public addItem(itemName: string) {
-    var newItem:ToDoItem = { id: '', name: itemName };
+    var newItem: ToDoItem = { id: '', name: itemName };
     this.addItemToList(newItem);
 
     var getUrl = this.url + "/api/listitems";
 
-    this.httpClient.post(getUrl,{name: itemName}).subscribe((x: ToDoItem) => {
+    this.httpClient.post(getUrl, { name: itemName }).subscribe((x: ToDoItem) => {
       newItem.id = x.id
     },
-    error =>{
-      this.removeItem(newItem);
-    });
+      error => {
+        this.removeItem(newItem);
+      });
   }
 
   private addItemToList(newItem: ToDoItem) {
@@ -46,16 +47,15 @@ export class ToDoItemsDataSourceRealService implements ToDoItemsDataSourceServic
 
   public setAsDone(toDoItem: ToDoItem) {
     this.removeItem(toDoItem);
-    if(toDoItem.id)
-    {
+    if (toDoItem.id) {
       var putUrl = this.url + "/api/listitems/" + toDoItem.id + "/check";
       debugger;
-      this.httpClient.put(putUrl,{}).subscribe((x: ToDoItem) => {
+      this.httpClient.put(putUrl, {}).subscribe((x: ToDoItem) => {
         debugger;
       },
-      error =>{
-        this.addItemToList(toDoItem);
-      });
+        error => {
+          this.addItemToList(toDoItem);
+        });
     }
   }
 
