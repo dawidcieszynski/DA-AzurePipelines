@@ -26,14 +26,14 @@ steps:
     displayName: 'dotnet build'
     inputs:
       projects: src/backend/ToDoList.sln
-      arguments: '--configuration Release'
+      arguments: '--configuration $(configuration)'
 
   - task: DotNetCoreCLI@2
     displayName: 'dotnet test'
     inputs:
       command: test
       projects: '**/*.UnitTests.csproj'
-      arguments: '--configuration Release --collect "Code coverage"'
+      arguments: '--configuration $(configuration) --collect "Code coverage"'
 
   - task: DotNetCoreCLI@2
     displayName: 'dotnet publish'
@@ -41,7 +41,7 @@ steps:
       command: publish
       publishWebProjects: false
       projects: src/backend/ToDoList.WebApi/ToDoList.WebApi.csproj
-      arguments: '--configuration Release -o $(Build.ArtifactStagingDirectory)/backend'
+      arguments: '--configuration $(configuration) -o $(Build.ArtifactStagingDirectory)/backend'
 
   - task: CmdLine@2
     displayName: 'dotnet tool install --global dotnet-ef'
